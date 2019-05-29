@@ -1,0 +1,8 @@
+Data files for the pseudoreal tests
+from 
+
+Causality challenge ( pairs??.txt ) 
+Deutche Wetter Dienst ( www.dwd.de )
+UCI repository (www.ics.uci.edu/~mlearn/MLRepository.html)
+Time Series Data library (www.robjhyndman.com/TSDL/, economical data)
+directly in R (Old faithfull geysir data, no file here)

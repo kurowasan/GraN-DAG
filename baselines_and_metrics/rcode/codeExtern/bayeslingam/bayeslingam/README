@@ -1,0 +1,216 @@
+-------------------------------------------------------------------------------
+Bayeslingam README
+-------------------------------------------------------------------------------
+
+BASIC INFO
+
+Name of pack:  BayesLiNGAM
+
+Homepage:      http://www.cs.helsinki.fi/group/neuroinf/lingam/bayeslingam/
+
+Version:       1.1 (May 29, 2009) 
+
+What it does:  Estimates a linear causal model, assuming
+               no unobserved confounders or selection variables.
+
+               The method is described in the following paper:
+
+               P.O. Hoyer and A.Hyttinen
+               "Bayesian discovery of linear acyclic causal models" 
+               Proceedings of the 25th Conference on Uncertainty in Artificial 
+               Intelligence (UAI-2009), pp. X-Y, 2009 (to appear).
+
+Authors:       Antti Hyttinen <antti.hyttinen@cs.helsinki.fi>
+               Patrik Hoyer <patrik.hoyer@helsinki.fi>
+               
+               (with PC-algorithm code by Prof. Peter Spirtes)
+
+-------------------------------------------------------------------------------
+
+VERSION HISTORY
+
+1.1 (2009/05/29) Updated package, first public release.
+1.0 (2009/03/13) Initial version, for UAI submission.
+
+-------------------------------------------------------------------------------
+
+TO DO / UPCOMING:
+
+- More cleaning, organizing of code.
+- Put into easy-to-load R 'package'.
+
+-------------------------------------------------------------------------------
+
+REQUIRED PACKAGES
+
+The following packages are needed.
+    -'deal' for GH-algorithm
+    -'mclust' for MoG Bayeslingam
+    -'combinat' for PC-algorithm
+    -'ggm' for PC-algorithm
+    -'fastICA' for standard LiNGAM
+    -'gtools' some method's in ETUDAG use this package (not used by BL)
+
+You can install them with the R 'install.packages' function, for example:
+  > install.packages('fastICA')
+
+And then load them up (this step is done in the code, so you don't have to)
+  > library('fastICA')
+
+-------------------------------------------------------------------------------
+STARTING UP
+
+After the packages are installed, go to the main directory, start R, and call
+  > source('loud.R')
+  > loud() 
+
+-------------------------------------------------------------------------------
+QUICKTESTING BAYESLINGAM
+  The following runs a quick test on the bayeslingam-algorithm.
+
+      > quicktestbayeslingam()
+
+  or with different parameters
+
+    Three nodes, gaussian data, also drawing the graphs:
+      > quicktestbayeslingam( nvars=3, nongaussiandata=FALSE )
+
+    Two nodes, nongaussian data, Gaussian Laplace model:
+      > quicktestbayeslingam( nvars=2, nongaussiandata=TRUE, 
+                              model='GL', drawgraph=TRUE)
+
+    You can also try the testbayeslingam function with tasks 1-4
+      > tesbayeslingam( task=2 )
+
+-------------------------------------------------------------------------------
+USAGE
+
+CREATING DATA
+
+You can create simulated data with
+    > D <- createData( list( nvars=3, N=1000, logk=0.5 ) )
+ 
+      nvars - number of variables
+      N - number of samples
+      logk - logarithm of the exponent, logk=0 for gaussian data
+      D$X - contains the data
+      D$parameters - contains the parameters
+      D$parameters$DAG - the correct DAG in cdag form (see ETUDAG readme)
+
+You can also create pseudorealdata with datasetindex in 1:20 referring to the
+    real dataset used.
+
+    D <- createPseudoData( list( datasetindex=1 ) )
+
+With larger networks you might want to try
+
+  D <- createCaseData( list( nvars=5, N=5000 ) )
+
+
+RUNNING ALL METHODS
+
+  Bayeslingam with Mixture of Gaussian model
+  
+    with 2 mixtures of gaussian
+      > R <- bayeslingam(D$X)
+      > R <- bayeslingam(D$X,model='MoG')
+  
+    with 3 mixtures of gaussian
+      > R <- bayeslingam(D$X,mixtures=3)
+      > R <- bayeslingam(D$X,model='MoG',mixtures=3)
+  
+  Bayeslingam with the Gaussian Laplace model
+      > R <- bayeslingam(D$X,model='GL')
+
+  Bayeslingam with the Gaussian Laplace model, MCMC sampling
+      > R <- bayeslingam(D$X,model='GL',mcmc=TRUE)
+
+  Greedy search bayeslingam:
+      > R <- greedybayeslingam(D$X)
+  
+  GH-algorithm:
+      > R <- dealer(D$X)
+
+
+  LiNGAM-algorithm
+      > R <- lingamer(D$X)
+  
+  PC-algorithm
+      > R <- pcer(D$X)
+  
+  For all of the above
+  
+      R$DAGs - all dags in the rows, in the causal order form
+      R$prob - probabilities for the dags
+      R$loglike - contains the loglikehood scores for the dags
+
+Try also 'testbayeslingam(task)' with tasks 1-6.
+
+
+PRINTING AND PLOTTING CLEAN RESULTS
+
+    > cleanResults(R)
+
+    > plotResults(R)
+
+  or also showing the original golden standard DAG
+
+    > plotResults(R,R$DAGs[D$parameters$dagind,])
+
+RATING THE RESULTS
+
+  Calculates binary, class, log and quadratic scores on the result of 
+    any of the algorithms.
+
+    > rate(R,D$parameters$dagind)
+
+-------------------------------------------------------------------------------
+
+REPRODUCING THE FIGURES IN THE PAPERS
+
+These produce similar figures as in the paper.
+
+1. The squareplot figure:
+    > testbayeslingam(task=7) #creating data, running algorithms
+    > testbayeslingam(task=9) #producing the figure
+
+2. The scoreplot figure:
+    (> testbayeslingam(task=7) ) #creating data, running the algorithms
+    > testbayeslingam(task=11) #producing the figure
+
+3. The pseudoreal plot figure.
+    > testbayeslingam(task=12) #creating pseudo real data, running algorithms 
+    > testbayeslingam(task=13) #producing the actual figure
+
+4. The plots on the priors 
+    > drawMoGPrior()
+    > drawGLPrior()
+
+5. TestCasePlot
+    > testbayeslingam( task=18 ) #creating data, running algorithms 
+                                 #plotting the dags
+
+-------------------------------------------------------------------------------
+
+FORTHCOMING IMPROVEMENTS
+
+Before UAI2009 conference the code should be made a little clearer. Also the 
+plots should be tested with the new kind of result handling.
+
+-------------------------------------------------------------------------------
+
+ACKNOWLEDGEMENTS
+
+We are very grateful to Prof. Peter Spirtes for providing the code for the 
+PC-algorithm in this package.
+
+-------------------------------------------------------------------------------
+
+QUESTIONS?
+
+If you have any questions, please send email to:
+
+Antti Hyttinen <antti.hyttinen@cs.helsinki.fi>
+Patrik Hoyer <patrik.hoyer@helsinki.fi>
+
+-------------------------------------------------------------------------------

@@ -1,0 +1,259 @@
+These are instructions from Peter supplied with the code in this directory.
+
+# a = rnorm(1000)
+# b = rnorm(1000)
+# c = a + b + rnorm(1000, sd=.01)
+# data = make_continuousdata(data.frame(cbind(a,b,c)))
+# pc(data)
+
+#
+
+
+#pc(data)
+
+#data = import_tetrad_file("~/Desktop/Tetrad Examples/bollen.txt")
+#fci(data)
+
+#data = import_tetrad_file("~/Desktop/New R Examples/test1.txt")
+
+The pc and cpc algoriths operate on one of the two following kinds of
+data.
+
+1. Creating the input data:
+
+One data type is a covariance matrix, e.g. in the following example
+called t1dat.
+
+> t1dat
+An object of class ?covariancedata?
+Slot "cov_matrix":
+        X1      X2       X3      X4      X5      X6       X7      X8      X9     X10
+1   3.7900 -1.3058   1.7180 -1.4205 -4.9743 -0.1181  -2.5092 -0.7081 -4.0328 -0.1395
+2  -1.3058  1.0193  -0.8214  0.0622  2.3864 -1.3517   1.2465 -1.8490  1.4487  0.0122
+3   1.7180 -0.8214   9.1937  0.0088 -4.8598  1.1876 -11.0627  5.9776 -7.3991  3.5413
+4  -1.4205  0.0622   0.0088  2.1748  1.4770  2.8317  -0.2608  4.9112  1.6606  0.0046
+5  -4.9743  2.3864  -4.8598  1.4770 10.9898 -1.3927   7.7242 -2.2589  7.8856 -1.7243
+6  -0.1181 -1.3517   1.1876  2.8317 -1.3927  7.2857  -2.0882 11.4650  0.1526  0.0378
+7  -2.5092  1.2465 -11.0627 -0.2608  7.7242 -2.0882  19.6865 -6.2390 12.6631 -6.1900
+8  -0.7081 -1.8490   5.9776  4.9112 -2.2589 11.4650  -6.2390 24.3137 -0.5766  1.3087
+9  -4.0328  1.4487  -7.3991  1.6606  7.8856  0.1526  12.6631 -0.5766 11.2426 -3.7548
+10 -0.1395  0.0122   3.5413  0.0046 -1.7243  0.0378  -6.1900  1.3087 -3.7548  2.9259
+
+Slot "size":
+[1] 500
+
+Slot "variable_names":
+ [1] "X1"  "X2"  "X3"  "X4"  "X5"  "X6"  "X7"  "X8"  "X9"  "X10"
+
+This type of object can be created in two ways. One is by using the
+function make_covariancedata. Suppose that you have sample data for variables
+X1 through X10. The first argument is a data frame containing the
+covariance matrix (with the variable names); the second argument is
+the sample size.
+
+> t1dat <- make_covariancedata(data.frame(cov(cbind(x1,x2,x3,x4,x5,x6,x7,x8,x9,x10))),1000)
+
+It is also possible to create an object of type "covariancedata" by
+reading it in. Suppose that the file t1.tx contains the following text:
+
+/Covariance
+500
+X1    X2    X3    X4    X5    X6    X7    X8    X9    X10   
+3.7900   
+-1.3058    1.0193   
+1.7180    -0.8214    9.1937   
+-1.4205    0.0622    0.0088    2.1748   
+-4.9743    2.3864    -4.8598    1.4770    10.9898   
+-0.1181    -1.3517    1.1876    2.8317    -1.3927    7.2857   
+-2.5092    1.2465    -11.062    -0.2608    7.7242    -2.0882    19.6865   
+-0.7081    -1.8490    5.9776    4.9112    -2.2589    11.4650    -6.2390    24.3137   
+-4.0328    1.4487    -7.3991    1.6606    7.8856    0.1526    12.6631    -0.5766    11.2426   
+-0.1395    0.0122    3.5413    0.0046    -1.7243    0.0378    -6.1900    1.3087    -3.7548    2.9259
+
+> t1dat <- import_tetrad_file("t1.txt")
+
+creates a covariancedata object.
+
+You can also input raw data of type "continuousdata" into pc. Suppose
+that you have sample data from 3 variables e1, e2, and e3 with 10
+sample points using make_continuousdata.
+
+> datanew = make_continuousdata(data.frame(cbind(e1,e2,e3)))
+> datanew
+An object of class ?continuousdata?
+Slot "data":
+            e1         e2          e3
+1  -0.63506050 -0.5982644 -0.52180981
+2  -0.15309327  0.6627921  0.30762521
+3  -0.83386373  2.0034944 -0.38406792
+4   0.50564839  0.5349590 -0.11630687
+5   1.58361558  0.7173646 -0.47227076
+6  -0.95385615  0.7191551  0.40234537
+7  -0.05030246 -0.8440403 -0.75694843
+8  -0.92578156 -0.1937220 -0.59876082
+9  -0.50185639 -0.6236224 -0.03507728
+10  0.05951542 -0.4606153 -1.03950080
+
+Slot "size":
+[1] 10
+
+Slot "variable_names":
+[1] "e1" "e2" "e3"
+
+You can also read raw data in from a file of the following
+form. Suppose the file t2.txt contains:
+
+/continuousdata
+e1 e2 e3
+-0.63506050 -0.5982644 -0.52180981
+-0.15309327  0.6627921  0.30762521
+-0.83386373  2.0034944 -0.38406792
+0.50564839  0.5349590 -0.11630687
+1.58361558  0.7173646 -0.47227076
+-0.95385615  0.7191551  0.40234537
+-0.05030246 -0.8440403 -0.75694843
+-0.92578156 -0.1937220 -0.59876082
+-0.50185639 -0.6236224 -0.03507728
+0.05951542 -0.4606153 -1.03950080
+
+> t1dat = import_tetrad_file("t2.txt")
+
+creates an object of type "continuousdata".
+
+
+
+2. Running pc
+
+pc takes two arguments. The first is a data object either of type
+"covariancedata" or an object of type "continuousdata". The second is
+a significance level, which defaults to 0.05.
+
+> t1out = pc(shaw2, prgt = 0.01)
+
+pc returns a matrix that represents a mixed graph of directed and
+undirected edges.
+
+    X1 X2 X3 X4 X5 X6 X7 X8 X9 X10
+X1   0  2  0  0  2  0  2  0  2   0
+X2   1  0  0  0  2  1  0  0  0   0
+X3   0  0  0  0  0  0  1  2  0   0
+X4   0  0  0  0  0  3  0  2  0   0
+X5   1  1  0  0  0  0  0  0  0   1
+X6   0  2  0  3  0  0  0  2  0   0
+X7   1  0  2  0  0  0  0  0  2   1
+X8   0  0  1  1  0  1  0  0  0   1
+X9   1  0  0  0  0  0  1  0  0   0
+X10  0  0  0  0  2  0  2  2  0   0
+
+The i-j and j-i entry in the matrix is zero if there is no edge bewteen the ith and jth
+variable. If there is an edge i -> j, the i-j entry is 2 (representing
+an arrow head) and the j - i entry is 1 (representing the arrow tail.)
+If the i - j edge is unoriented, then the i - j and the j - entry are
+both 3. You can also print out the output of pc in readable form using printadj.
+
+> printadj(t1out)
+X1 ->X2
+X1 ->X4
+X1 ->X5
+X2 ->X5
+X6 ->X2
+X3o-oX7
+X3 ->X8
+X6 ->X4
+X8 ->X4
+X10 ->X5
+X6 ->X8
+X7o-oX9
+X7o-oX10
+X10 ->X8
+
+As a rough rule of thumb, for sample sizes over 1000 we use
+significance level 0.01; between 100 and 1000 we use .05; between 50
+and 100 we use .1; less than 50 we use .15 or .2.
+
+3. Running cpc
+cpc runs on the same objects as pc, in the same way, e.g.
+
+> t1out1 = cpc(t1dat,0.01)
+[[1]]
+    X1 X2 X3 X4 X5 X6 X7 X8 X9 X10
+X1   0  3  0  3  2  0  0  0  0   0
+X2   3  0  0  0  2  2  0  0  0   0
+X3   0  0  0  0  0  0  3  2  0   0
+X4   3  0  0  0  0  2  0  2  0   0
+X5   1  1  0  0  0  0  0  0  0   1
+X6   0  1  0  1  0  0  0  2  0   0
+X7   0  0  3  0  0  0  0  0  3   3
+X8   0  0  1  1  0  1  0  0  0   1
+X9   0  0  0  0  0  0  3  0  0   0
+X10  0  0  0  0  2  0  3  2  0   0
+
+[[2]]
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11]
+[1,]    1    1    1    2    3    3    4    5    5     7     7
+[2,]    2    4    4    1    8    8    8    2   10     3    10
+[3,]    6    6    8    4    4   10   10    6    8     8     8
+
+The first element  of the list that is returned is just a mixed graph
+of directed and undirected edges. It can be printed in readable form
+by printadj. The second element of the list is an array of "ambiguous"
+triples. A triple gets put into the array when
+1.) the first element X and the third element Z are adjacent to the second
+element Y but not to each other;
+2.) there exist two sets of variables such that each is a subset of
+the variables adjacent X or a subset of the variables adjacent to Z,
+and one of the sets contains Y while the other set does not contain Y. (This is a violation of
+faithfulness).
+
+In practice, in some cases, there are two variables X and Z that are
+independent conditional on some subset of the neighbors of X or a
+subset of the neighbors of Z at the time that the test is done,
+but later more edges are removed, and no subset of the final set of neighbors of
+X or of Z make X and Z conditionally independent. In this case, if X
+and Z are both adjacent to Y, I count X - Y - Z as ambiguous as
+well. It may be that variables in an ambiguous triple get oriented
+later by other orientation rules - however, I just leave them in the
+ambiguous list, since the list indicates that there was some
+conflicting evidence about the orientations.
+
+The array of ambiguous triples can be printed out in more readable
+form by calling  list can be printed in readable form by calling
+printlist, with the array of ambiguous triples and the array
+representing the mixed graph as arguments.
+
+> printlist(t1out1[[2]],t1out1[[1]])
+Ambiguous triples
+X1   X2   X6
+X1   X4   X6
+X1   X4   X8
+X2   X1   X4
+X3   X8   X4
+X3   X8   X10
+X4   X8   X10
+X5   X2   X6
+X5   X10   X8
+X7   X3   X8
+X7   X10   X8
+
+4. Things I did not do
+The output of pc is a mixed graph. If the data is
+faithful to a DAG, and the conditional independence tests make no
+errors, then the mixed graph is a pattern (pdag, essential
+graph). However, if the data is not faithful to a DAG, or the
+conditional independence tests are wrong, it may contain a cycle of more
+than 4 edges which contains no collider, which is not a pattern. I
+have not tried to deal with this because it tends to be expensive and
+ends up reducing the overall accuracy. Moreover, in the cpc algorithm
+it is a fairly rare event.
+
+The output of the cpc algorithm is not a pattern because of the
+ambiguous triples. The mixed graph represents a set of patterns,
+because some of the unshielded triples can be either colliders or
+non-colliders. cpc tends to be less informative than pc because of the
+ambiguous triples, but it also makes many fewer mistakes. You should
+read the UAI cpc paper for details.
+
+DEBUG is set to FALSE when the file is read in. If you set it to TRUE,
+a lot of debugging information is printed out.
+
+ 

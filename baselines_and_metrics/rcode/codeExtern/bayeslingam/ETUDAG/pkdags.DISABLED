@@ -1,0 +1,193 @@
+#pkdags implements the functions for counting the number of dags and
+#creating all dags
+
+pkdags_path=sprintf('%s/trunk/ETUDAG/pkdags',cauzality_path)
+
+#times (no files saved) (imac, 2.4 core 2 duo)
+# 4 variables, alldags=2.6s, pkdags=0.2s
+# 5 variables, alldags=2-4h?, pkdags=6.7s
+# 6 variables, alldags=days,weeks?, pkdags=13 minutes
+# 7 variables, alldags=never?, pkdags= array too big!
+
+npdags<-function( p ) {
+  N<-0
+  for (k in 1:p) {
+    N<-N+npkdags(p,k)
+  }
+  N
+}
+
+npkdags<-function(p, k) {
+  N<-0
+  if (p > k) {
+    for (n in 1:(p-k) ) {
+      N<-N+((2^k-1)^n)*(2^(k*(p-n-k)))*choose(p,k)*npkdags(p-k,n)
+    }
+  } else { 
+    #otherwise there is exactly one DAG with p nodes
+    #and k=p nodes with indegree 0
+    N<-1
+  }
+  N
+}
+
+pdags<-function(p) {
+  filename<-sprintf('%s/pkdags%i.Rdata', pkdags_path,p)
+  if ( file.access(filename,0) == 0 ) {
+    load(filename)
+  } else {
+    ndags<-npdags(p)
+    DAGs<-array(0,c(ndags,p+p*(p-1)/2))
+    DAGindex<-1
+    for ( k in negindex(p,1) ) {
+      newDAGs<-pkdags(p,k)
+      DAGs[index(DAGindex,DAGindex+nrow(newDAGs)-1),]<-newDAGs
+      DAGindex<-DAGindex+nrow(newDAGs)
+    }
+    save(DAGs,file=filename)
+  }
+  DAGs
+}
+
+
+#this one creates all dags with p nodes and k nodes with indegree 0
+pkdags<-function(p,k) { 
+  #k is the number of points with 0 indegree i.e. new points
+  filename<-sprintf('%s/pkdags%i_%i.Rdata', pkdags_path,p,k)
+  
+  ndags<-npkdags(p,k)
+  DAGs <- matrix(0,ndags,p+p*(p-1)/2)
+                #p node labels + (p-1)+(p-2)+..1=p*(p-1)/2
+  DAGindex<-0
+  if ( p == k ) {
+    #in this case there is only one dag with no edges
+    DAGs[1,index(1,p)]<-index(1,p)
+
+  } else if ( file.access(filename,0) == 0 ) {
+    load(filename)
+  } else {
+      #we have to actually calculate the thing
+    for ( n in index(1,p-k) ) { 
+        # n is the number of old points with indegree 0
+      oldDAGs<-pkdags(p-k,n)
+
+      for ( d in 1:nrow(oldDAGs) ) {
+        olddag<-oldDAGs[d,]
+  
+        oldlabels<-olddag[index(1,p-k)]
+
+        oldB<-dag2B_unordered(olddag)
+
+
+        newlabelings<-t(combn(index(1,p),k))
+
+        for ( q in index(1,nrow(newlabelings)) ) {  
+          newlabeling<-newlabelings[q,]
+
+            #old labeling is just any one gotten from the
+            #remaining points
+          oldlabeling<-((index(1,p))[-newlabeling])[oldlabels]
+                  
+            #from new to old with 0 indegree
+            #on each row there must be at least one 1
+            #so draw these independenty
+#         for ( i in 1:(2^(n*k)-1) ) {
+#           new2old0B<-array(dec.to.bin(i,n*k),c(n,k) )
+#       
+#           if ( any(rowSums(new2old0B) == 0 ) ) {
+#            #doesnt work!, same dag is added twice!
+#             next
+#           }
+          new2old0B<-array(0,c(n,k) )
+          new2old0B[,k]<-1 #initialize all with ones in the last row
+          while (TRUE) {
+          #for ( i in 1:n ) {
+              #for every row put
+            #for ( ii in 1:(2^k-1) ) {
+            #  new2old0B[i,]<-dec.to.bin(ii,k)
+        
+            for ( j in index(0,(2^((p-k-n)*k)-1)) ) {
+              #from new to old with pos indegree
+              #we can just draw the whole matrix
+              #print(c(j,p,k,n))
+              if ( (p-k-n)*k > 0 ) {
+                new2oldPB<-array( dec.to.bin(j,(p-k-n)*k),c(p-k-n,k) )
+              } else {
+                new2oldPB<-array( 0,c(p-k-n,k) )
+              }
+              newB<-array(0,c(k,p))
+              new2oldB<-rbind(new2old0B,new2oldPB)
+            
+              B<-rbind( newB, cbind(new2oldB,oldB) )
+            
+              dag<-B2dag(B)
+              
+            
+              #change the labeling!
+              dag[index(1,p)]<-c(newlabeling,oldlabeling)
+  
+              DAGindex<-DAGindex+1
+              DAGs[DAGindex,]<-dag
+            }#for j
+            #now increment the last row of new2old0B by 1
+            #if the last row is 11111 the increment second to last row 
+            #and put last row to 000001, and so on
+            if ( all(new2old0B == 1) ) { #if all were ones, exit
+              break;
+            }
+            #othewise increment
+            new2old0B<-increment(new2old0B)
+          }#while
+        }#for q
+      }#for d
+    }#for n
+    save(DAGs,file=filename)
+  }#else not pkdags(p,p)
+  #save the file for further use
+  
+  
+  DAGs
+}
+
+increment<-function(B,i=nrow(B)) {
+  if ( all( B[i,] == 1 ) ) {
+    B[i,]<-0
+    B[i,ncol(B)]<-1
+    B<-increment(B,i-1)
+  } else {
+    j<-max(which(B[i,] == 0))
+    #print(j)
+    B[i,j]<-1
+    B[i,index(j+1,ncol(B))]<-0
+  }
+  B
+}
+
+dag2B_unordered<-function(dagvector) {
+  nvars<-max(dagvector)
+  B<-array(0,c(nvars,nvars))
+  B[lower.tri(B,diag=FALSE)] <- dagvector[nvars+(1:(nvars*(nvars-1)/2))]
+  B
+}
+
+B2dag<-function(B) {
+  c( index(1,nrow(B)), c(B[lower.tri(B,diag=FALSE)]) )
+}
+
+validate<-function( D1, D2 ) {
+  #validate D1 with D2
+  C<-rep(0,nrow(D2))
+  I<-array('',nrow(D2))
+  for ( i in 1:nrow(D1) ) {
+    B1<-dagvector2B(D1[i,])
+    for ( j in 1:nrow(D2) ) {
+      B2<-dagvector2B(D2[j,])
+      if (all(B1 == B2) ) {
+        C[j]<-C[j]+1
+        I[j]<-sprintf('%s,%i',I[j],i)
+      }
+    }
+  }
+  list(C,I)
+}
+

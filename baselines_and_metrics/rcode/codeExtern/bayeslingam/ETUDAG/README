@@ -1,0 +1,30 @@
+This is the Easy To Use DAG package README
+The package is still under development.
+
+The package is coded by Antti Hyttinen <antti.hyttinen@cs.helsinki.fi>
+	and Doris Entner <doris.entner@cs.helsinki.fi> 
+		(additions to hidden variable DAGs and d-separation code)
+	and Patrik Hoyer <patrik.hoyer@cs.helsinki.fi>
+		(some structures and functions are copied from his code)
+
+There three types of 'DAGs' used
+
+cdag - presentation with order and the lower diagonal of the b-matrix
+bdag - the b matrix, possibly in binary (B(i,j)=1 if i<-j )
+mdag - markov equivalence class of dags, pattern, partially oriented dag, 
+       B(i,j)= 1 if i<-j
+       B(i,j)= 2 if i->j
+       B(i,j)= 3 if i-j
+       this is the definition of a pattern used in the PC algorithm package
+tdag - a text form of dag, as in the deal package
+
+The functions use these at the moment quite wildly but
+  if the argument is BDAG then the function wants a bdag,
+  if the argument is MBDAG it accepts an mdag or a bdag
+  if the argument is BDAGs the a list of bdags is ok, that is 3 dimensional matrix
+    where the last index denotes the dag index, so BDAGs[,,3] is a bdag.
+
+
+Call loadETUDAG() to load the package.
+
+Some functions are not yet implemented.

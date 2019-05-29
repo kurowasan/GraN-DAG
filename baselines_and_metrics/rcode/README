@@ -1,0 +1,77 @@
+# Copyright (c) 2010 - 2014  Jonas Peters  [peters@stat.math.ethz.ch]
+# All rights reserved.  See the file COPYING for license terms. 
+
+
+===
+CORRESPONDING PAPER
+===
+This code is supplementary material for 
+J. Peters, J. Mooij, D. Janzing, B. Sch\"olkopf: "Causal Discovery with Continuous Additive Noise Models", JMLR 15:2009-2053, 2014.
+
+
+===
+PACKAGES
+===
+This code requires a couple of R-packages. Install them by starting R and running
+##############
+# RUN FROM HERE ...
+##############
+source("http://bioconductor.org/biocLite.R")
+biocLite(c("graph","RBGL")) 
+install.packages("mgcv")
+install.packages("pcalg")
+install.packages("kernlab")
+install.packages("igraph")
+install.packages("parallel")
+install.packages("mgcv")
+install.packages("gptk")
+install.packages("clue")
+install.packages("mboost")
+install.packages("fastICA")
+install.packages("glmnet")
+##############
+# ... UNTIL HERE
+##############
+
+===
+EXAMPLE
+===
+After starting R in this folder run 
+> source("./code/experiments/ANM/exampleSEMIND.R", chdir = TRUE)
+(You can disable brute force to save some time.)
+
+===
+MAIN FUNCTIONS FOR RESIT, GDS AND BRUTE FORCE
+===
+The main functions can be found in
+"YOURPATH/code/inferDAG/"
+including the functions GDS.R, BruteForce.R, ICML.R ("RESIT"). To load all necessary files for GDS, for example, run
+> source("./code/startups/startupGDS.R", chdir = TRUE)
+Most of these functions take a (sample size x dimension) dimensional matrix as input and provide (a score and) an adjacency matrix as output.
+
+
+===
+EXPERIMENTS FROM PAPER
+===
+The simulation experiments can be found in the folder 
+"YOURPATH/code/experiments/ANM/"
+In principle, you can run
+> source("./code/experiments/ANM/experiment2Sparsep4.R", chdir = TRUE) 
+Note, however, that you may want to change the number of cores (currently all set to one). Otherwise the code might take very long to finish. 
+
+
+===
+COPYING
+===
+See COPYING for license terms.
+
+
+===
+DISCLAIMER AND QUESTIONS
+===
+I am sorry that some parts of the code are not well documented yet.
+The code is not optimized for speed either.
+Please send me an email if there are any open questions.
+peters@stat.math.ethz.ch
+
+

@@ -1,0 +1,14 @@
+#draws a random dags  by how?
+#returns a bdag with each
+#first draw the order, then draw the edges!
+#how to actually do this, very unclear!
+
+randomDAG<-function( nvars ) {
+  #draw the order
+  cdag<-rep(0,nvars+(nvars*(nvars-1)/2))
+  cdag[1:nvars]<-sample(1:nvars,nvars)
+  cdag[(nvars+1):(nvars+(nvars*(nvars-1)/2))]<-sample(c(0,1),(nvars*(nvars-1)/2),
+                                                      replace=TRUE)
+  #then draw the edges
+  cdag
+}

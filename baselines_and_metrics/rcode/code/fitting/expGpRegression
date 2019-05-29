@@ -1,0 +1,17 @@
+library("gptk")
+
+ss<-300
+x<-runif(ss,-5,5)
+x2<-rnorm(ss,0,2)
+y<-matrix(sin(0.3*x)+rnorm(ss,0,0.1))
+X<-matrix(cbind(x,x2),ncol=2)
+X<-matrix(x)
+
+options=gpOptions("ftc")
+options$kern$comp=list("rbf","white")
+options$learnScales=TRUE
+model<-gpCreate(dim(X)[2],1,X,y,options)
+y2<-gpOut(model,X)
+plot(x,y)
+plot(x,y2)
+
