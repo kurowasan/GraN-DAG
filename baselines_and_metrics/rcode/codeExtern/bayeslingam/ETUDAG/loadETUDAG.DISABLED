@@ -1,6 +1,0 @@
-#loads everything
-
-loadETUDAG<-function() {
-  ETUDAG_dir<-sprintf("%s/trunk/ETUDAG",cauzality_path)
-  sourceDir(ETUDAG_dir, trace=FALSE)
-}
