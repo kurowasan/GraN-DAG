@@ -1,7 +1,7 @@
 """
 GraN-DAG
 
-Copyright © 2019 Sébastien Lachapelle, Philippe Brouillard, Tristan Deleu
+Copyright © 2019 Authors of Gradient-Based Neural DAG Learning
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the

@@ -19,7 +19,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 """
 import sys
 #sys.path.remove("/usr/local/lib/python3.7/dist-packages/cdt-0.5.2-py3.7.egg")
-#sys.path.append("/mnt/home/lachaseb/PycharmProjects/causal_discovery_toolbox")
 import cdt
 import os
 import time
