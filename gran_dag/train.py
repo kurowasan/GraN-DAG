@@ -346,7 +346,7 @@ def to_dag(model, train_data, test_data, opt, metrics_callback, plotting_callbac
     time0 = time.time()
 
     if opt.jac_thresh:
-        A = compute_jacobian_avg(model, train_data, train_data.num_samples)
+        A = compute_jacobian_avg(model, train_data, train_data.num_samples).t()
     else:
         A = model.get_w_adj()
     A = A.detach().cpu().numpy()
