@@ -1,6 +1,5 @@
 #!/bin/bash
-# TODO: finalize...
-# make sure <TODO: insert container name> is in your working directory
+# make sure container.simg is in your working directory
 # make sure singularity is installed on your computer.
 
 CODE_PATH="/your/path/to/code/"  # path to the code root
@@ -11,5 +10,7 @@ DATA_INDEX=1  # Choose which dataset to use. Program will use (data${DATA_INDEX}
 NUM_VARS=10  # should match the data provided
 
 # Run python program. This is the Augmented Lagrangian procedure, without PNS. (add --pns to the command line to perform PNS)
-# TODO: watch container name + paths inside the container probably don't exist.
-singularity exec --containall -B $DATA_PATH:/dataset/ -B $EXP_PATH:/final_log/ -B $CODE_PATH:/code/ ./pytorch_r.sif bash -c "/opt/miniconda3/envs/pytorch/bin/python /code/main.py --exp-path /final_log/ --data-path /dataset/ --i-dataset ${DATA_INDEX} --model $MODEL --train --to-dag --num-vars ${NUM_VARS} --jac-thresh"
+singularity exec --containall -B $DATA_PATH:/dataset/ -B $EXP_PATH:/final_log/ -B $CODE_PATH:/code/ ./container.simg bash -c "cd /code && python main.py --exp-path /final_log/ --data-path /dataset/ --i-dataset ${DATA_INDEX} --model $MODEL --train --to-dag --num-vars ${NUM_VARS} --jac-thresh"
+
+# To use the baselines methods, replace main.py by the right path (e.g. for notears, it is notears/main.py)
+# singularity exec --containall -B $DATA_PATH:/dataset/ -B $EXP_PATH:/final_log/ -B $CODE_PATH:/code/ ./container.simg bash -c "cd /code && python cam/main.py --exp-path /final_log/ --data-path /dataset/ --i-dataset ${DATA_INDEX}"
