@@ -136,9 +136,5 @@ if __name__ == "__main__":
                         help="Final thresholding")
 
     opt = parser.parse_args()
-    opt.train_samples = 0.8
-    opt.test_samples = None
-    opt.random_seed = 42
-    opt.normalize_data = False
 
     main(opt, metrics_callback=_print_metrics)

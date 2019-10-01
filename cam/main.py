@@ -96,14 +96,18 @@ if __name__ == "__main__":
                         help='Perform an initial pruning step')
     # parser.add_argument('--prune-method', type=str, default="gam",
     #                     help='after to-dag or pruning, retrain model from scratch before reporting nll-val')
+    parser.add_argument('--train-samples', type=int, default=0.8,
+                        help='Number of samples used for training (default is 80% of the total size)')
+    parser.add_argument('--test-samples', type=int, default=None,
+                        help='Number of samples used for testing (default is whatever is not used for training)')
+    parser.add_argument('--normalize-data', action="store_true",
+                        help='(x - mu) / std')
+    parser.add_argument('--random-seed', type=int, default=42,
+                        help="Random seed for pytorch and numpy")
 
     opt = parser.parse_args()
     opt.score = 'nonlinear'
     opt.sel_method = 'gamboost'
     opt.prune_method = 'gam'
-    opt.train_samples = 0.8
-    opt.test_samples = None
-    opt.random_seed = 42
-    opt.normalize_data = False
 
-    main(opt, _print_metrics)
+    main(opt, metrics_callback=_print_metrics)

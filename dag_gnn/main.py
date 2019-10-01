@@ -114,6 +114,8 @@ if __name__ == "__main__":
     parser.add_argument('--exp-path', type=str, default='exp',
                         help='Path to experiments')
     parser.add_argument('--pns', action='store_true')
+    parser.add_argument('--pns-thres', type=float, default=0.75)
+    parser.add_argument('--cutoff', type=float, default=0.001)
 
     # -----------data parameters ------
     parser.add_argument('--data_sample_size', type=int, default=1000,
@@ -197,11 +199,17 @@ if __name__ == "__main__":
     parser.add_argument('--dynamic-graph', action='store_true', default=False,
                         help='Whether test with dynamically re-computed graph.')
 
+    parser.add_argument('--train-samples', type=int, default=0.8,
+                        help='Number of samples used for training (default is 80% of the total size)')
+    parser.add_argument('--test-samples', type=int, default=None,
+                        help='Number of samples used for testing (default is whatever is not used for training)')
+    parser.add_argument('--normalize-data', action="store_true",
+                        help='(x - mu) / std')
+    parser.add_argument('--random-seed', type=int, default=42,
+                        help="Random seed for pytorch and numpy")
+    parser.add_argument('--cam-pruning', action='store_true')
 
-    args = parser.parse_args()
-    args.train_samples = 0.8
-    args.test_samples = None
-    args.random_seed = 42
-    args.normalize_data = False
 
-    main(args, metrics_callback=_print_metrics)
+    opt = parser.parse_args()
+
+    main(opt, metrics_callback=_print_metrics)
