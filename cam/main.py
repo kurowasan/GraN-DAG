@@ -12,10 +12,10 @@ from gran_dag.plot import plot_adjacency
 from gran_dag.utils.save import dump
 from gran_dag.utils.metrics import edge_errors
 from gran_dag.data import DataManagerFile
-from cam.cam import CAM_with_score
+from cam import CAM_with_score
 
 
-def main(opt, metrics_callback, plotting_callback=None):
+def main(opt, metrics_callback=None, plotting_callback=None):
     time0 = time.time()
     opt.model = "cam"
 
@@ -52,9 +52,10 @@ def main(opt, metrics_callback, plotting_callback=None):
     if not os.path.exists(opt.exp_path):
         os.makedirs(opt.exp_path)
 
-    metrics_callback(stage="cam", step=0,
-                     metrics={"train_score": train_score, "val_score": val_score, "sid": sid, "shd": shd,
-                              "shd_cpdag": shd_cpdag, "fn": fn, "fp": fp, "rev": rev}, throttle=False)
+    if metrics_callback is not None:
+        metrics_callback(stage="cam", step=0,
+                         metrics={"train_score": train_score, "val_score": val_score, "sid": sid, "shd": shd,
+                                  "shd_cpdag": shd_cpdag, "fn": fn, "fp": fp, "rev": rev}, throttle=False)
 
     dump(opt, opt.exp_path, 'opt')
     dump(timing, opt.exp_path, 'timing', True)
@@ -66,6 +67,9 @@ def main(opt, metrics_callback, plotting_callback=None):
 
     plot_adjacency(gt_dag, dag, opt.exp_path)
 
+def _print_metrics(stage, step, metrics, throttle=None):
+    for k, v in metrics.items():
+        print("    %s:" % k, v)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -88,7 +92,7 @@ if __name__ == "__main__":
                         help='Threshold value for vaiable selection')
 
     # Pruning
-    parser.add_argument('--pruning', action="store_true",
+    parser.add_argument('--pruning', action="store_true", default=True,
                         help='Perform an initial pruning step')
     # parser.add_argument('--prune-method', type=str, default="gam",
     #                     help='after to-dag or pruning, retrain model from scratch before reporting nll-val')
@@ -97,5 +101,9 @@ if __name__ == "__main__":
     opt.score = 'nonlinear'
     opt.sel_method = 'gamboost'
     opt.prune_method = 'gam'
+    opt.train_samples = 0.8
+    opt.test_samples = None
+    opt.random_seed = 42
+    opt.normalize_data = False
 
-    main(opt)
+    main(opt, _print_metrics)
