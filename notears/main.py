@@ -8,15 +8,15 @@ import networkx as nx
 import torch
 
 import sys
-
 sys.path.append("..")
+
 from gran_dag.plot import plot_adjacency
 from gran_dag.utils.save import dump
 from gran_dag.utils.metrics import edge_errors
 from gran_dag.dag_optim import is_acyclic
 from gran_dag.data import DataManagerFile
 from gran_dag.train import cam_pruning_, pns_
-from notears.notears.notears import notears, retrain
+from notears.notears import notears, retrain
 
 def main(opt, metrics_callback, plotting_callback=None):
     # Control as much randomness as possible
@@ -101,6 +101,9 @@ def main(opt, metrics_callback, plotting_callback=None):
     dump(shd, opt.exp_path, 'shd', True)
     np.save(os.path.join(opt.exp_path, "DAG"), adj)
 
+def _print_metrics(stage, step, metrics, throttle=None):
+    for k, v in metrics.items():
+        print("    %s:" % k, v)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -111,6 +114,10 @@ if __name__ == "__main__":
                         help='dataset index')
     parser.add_argument('--exp-path', type=str, default='exp',
                         help='Path to experiments')
+    parser.add_argument('--pns', action='store_true')
+    parser.add_argument('--cam-pruning', action='store_true')
+    parser.add_argument('--max-iter-retrain', type=int, default=10000)
+
     parser.add_argument('--train-samples', type=int, default=0.8,
                         help='Number of samples used for training (default is 80% of the total size)')
     parser.add_argument('--test-samples', type=int, default=None,
@@ -119,7 +126,7 @@ if __name__ == "__main__":
                         help='(x - mu) / std')
     parser.add_argument('--random-seed', type=int, default=42,
                         help="Random seed for pytorch and numpy")
-    parser.add_argument('--lambda1', type=float, default=0.01, #TODO: What is the default value used by Tristan?
+    parser.add_argument('--lambda1', type=float, default=0.01,
                         help="L1 coeff")
     parser.add_argument('--max-iter', type=int, default=100,
                         help="maximal number of subproblems to solve")
@@ -129,5 +136,9 @@ if __name__ == "__main__":
                         help="Final thresholding")
 
     opt = parser.parse_args()
+    opt.train_samples = 0.8
+    opt.test_samples = None
+    opt.random_seed = 42
+    opt.normalize_data = False
 
-    main(opt)
+    main(opt, metrics_callback=_print_metrics)

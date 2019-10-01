@@ -15,8 +15,8 @@ from gran_dag.utils.metrics import edge_errors
 from gran_dag.dag_optim import is_acyclic
 from gran_dag.data import DataManagerFile
 from gran_dag.train import cam_pruning_, pns_
-from dag_gnn.dag_gnn.train import dag_gnn, retrain
-from dag_gnn.dag_gnn.utils import load_numpy_data
+from dag_gnn.train import dag_gnn, retrain
+from dag_gnn.utils import load_numpy_data
 
 def main(opt, metrics_callback, plotting_callback=None):
     # Control as much randomness as possible
@@ -107,6 +107,14 @@ def _print_metrics(stage, step, metrics, throttle=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--data-path', type=str, default=None,
+                        help='Path to data files')
+    parser.add_argument('--i-dataset', type=str, default=None,
+                        help='dataset index')
+    parser.add_argument('--exp-path', type=str, default='exp',
+                        help='Path to experiments')
+    parser.add_argument('--pns', action='store_true')
+
     # -----------data parameters ------
     parser.add_argument('--data_sample_size', type=int, default=1000,
                         help='the number of samples of data')
@@ -189,6 +197,11 @@ if __name__ == "__main__":
     parser.add_argument('--dynamic-graph', action='store_true', default=False,
                         help='Whether test with dynamically re-computed graph.')
 
+
     args = parser.parse_args()
+    args.train_samples = 0.8
+    args.test_samples = None
+    args.random_seed = 42
+    args.normalize_data = False
 
     main(args, metrics_callback=_print_metrics)

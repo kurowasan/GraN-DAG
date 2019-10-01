@@ -8,8 +8,8 @@ import networkx as nx
 import torch
 
 import sys
-
 sys.path.append("..")
+
 from gran_dag.plot import plot_adjacency
 from gran_dag.utils.save import dump
 from gran_dag.utils.metrics import edge_errors
@@ -31,7 +31,7 @@ def sample_random_dag(num_nodes, connectProb):
     return adj
 
 
-def main(opt, metrics_callback, plotting_callback=None):
+def main(opt, metrics_callback=None, plotting_callback=None):
     # Control as much randomness as possible
     torch.manual_seed(opt.random_seed)
     np.random.seed(opt.random_seed)
@@ -61,10 +61,11 @@ def main(opt, metrics_callback, plotting_callback=None):
     if not os.path.exists(opt.exp_path):
         os.makedirs(opt.exp_path)
 
-    metrics_callback(stage="random", step=0,
-                     metrics={"sid": sid, "shd": shd,
-                              "shd_cpdag": shd_cpdag, "fn": fn, "fp": fp, "rev": rev},
-                     throttle=False)
+    if metrics_callback is not None:
+        metrics_callback(stage="random", step=0,
+                         metrics={"sid": sid, "shd": shd,
+                                  "shd_cpdag": shd_cpdag, "fn": fn, "fp": fp, "rev": rev},
+                         throttle=False)
 
     dump(opt, opt.exp_path, 'opt')
     dump(timing, opt.exp_path, 'timing', True)
