@@ -7,4 +7,4 @@ partly on the R programming language.
 
 ## Run the code
 To use our implementation of GraN-DAG, simply install Singularity (instructions: [https://www.sylabs.io/guides/3.0/user-guide/installation.html](https://www.sylabs.io/guides/3.0/user-guide/installation.html)) 
-and run the code in our container (download it here: [https://drive.google.com/file/d/1pcQB116Tt2IRoVPmqt610N0nPKUAwHsR/view?usp=sharing](https://drive.google.com/file/d/1pcQB116Tt2IRoVPmqt610N0nPKUAwHsR/view?usp=sharing)).
+and run the code in our container (download it here: [https://drive.google.com/file/d/1pcQB116Tt2IRoVPmqt610N0nPKUAwHsR/view?usp=sharing](https://drive.google.com/file/d/1pcQB116Tt2IRoVPmqt610N0nPKUAwHsR/view?usp=sharing)). Use start_example.sh (update the paths) to launch the differents methods (GraN-DAG, DAG-GNN, NOTEARS, CAM).
